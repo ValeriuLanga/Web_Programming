@@ -1,0 +1,49 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ShowRooms</title>
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script>
+                    $(document).ready(function(){
+                        $("#buttonGetAllRooms").click(function() {
+                            $.get("/Main/GetAllRooms",
+                                function(data,status) {
+                                    $("#maindiv").html(data);
+                            });
+                        });
+                    });
+    </script>
+
+    <meta name="viewport" content="width=device-width" />
+    <title>FilterRooms</title>
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script>
+                    $(document).ready(function(){
+                        $("#buttonGetRoomsWithPrice").click(function() {
+                            $.get("/Main/GetRoomsWithGivenPrice", { price: $("#price").val() },
+                                function(data,status) {
+                                    $("#maindiv").html(data);
+                            });
+                        });
+                    });
+    </script>
+</head>
+
+<body>
+    Price: <input type="text" id="price" />
+    <br />
+    <input id="buttonGetRoomsWithPrice" type="button" value="Show Rooms up to the given price" />
+    <br/>
+    <input id="buttonGetAllRooms" type="button" value="Show All Rooms" />
+    <br/>
+    Resulting rooms: 
+    <div id="maindiv"></div><br />
+
+</body>
+</html>
