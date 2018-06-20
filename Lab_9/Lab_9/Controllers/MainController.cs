@@ -44,12 +44,14 @@ namespace Lab_9.Controllers
             return View("FilterRooms");
         }
 
-        public string GetRoomCategories()
+        
+
+        public string GetRoomCategoriesAsHtmlFilter()
         {
             DAL dal = new DAL();
             List<Room> roomsList = dal.GetAllRooms();
 
-            string htmlFilter = "<select id='select_types' name='types'><option value=''>Filter by room category:</option>";
+            string htmlFilter = "<select id='select_types' name='types'>Filter by room category:</option>";
 
             HashSet<string> roomCategories = new HashSet<string>();
 
@@ -100,16 +102,41 @@ namespace Lab_9.Controllers
             List<Room> roomsList = dataAbstractionLayer.GetRoomsFromPrice(price);
             ViewData["roomsList"] = roomsList;
 
+            // form the html table
             string result = m_tableHeader;
-
             foreach ( Room room in roomsList)
             {
                 result += AddRoomFieldsToTableData(room);
             }
 
             result += "</table>";
-
             return result; 
+        }
+
+        public string GetRoomsByCategoryHtml()
+        {
+            DAL dal = new DataAbstractionLayer.DAL();
+
+            // get the category from the request
+            string category = Request.Params["category"];
+
+            List<Room> roomsList = dal.GetAllRooms();
+            List<Room> matchingRooms = new List<Room>();
+
+            foreach (Room room in roomsList)
+            {
+                if (room.Category == category)
+                    matchingRooms.Add(room);
+            }
+
+            string result = m_tableHeader;
+            foreach (Room room in matchingRooms)
+            {
+                result += AddRoomFieldsToTableData(room);
+            }
+            result += "</table>";
+
+            return result;
         }
 
         public string BookRoom()

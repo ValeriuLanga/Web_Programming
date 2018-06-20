@@ -72,7 +72,7 @@
     $(document).ready(function () {
 
         // fill the filter box with the types of rooms available
-        $.get("/Main/GetRoomCategories",
+        $.get("/Main/GetRoomCategoriesAsHtmlFilter",
             function (result) {
                 $("#select_types").html(result);
         });
@@ -133,6 +133,17 @@
             });
         });
 
+        // handle the selection of room categories
+        $("#select_types").on("change", function () {
+            var $type = $(this).val();
+
+            if ($type != ' ') {
+                $.get("/Main/GetRoomsByCategoryHtml",
+                    { category: $type }, function (result) {
+                        $("#maindiv").html(result);
+                    });
+            }
+        });
     });
 </script>
 
