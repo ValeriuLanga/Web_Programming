@@ -40,34 +40,30 @@
     
     <!--form which contains inputs for the filtering of the rooms-->
     <form class="container">
+
+        <input class="input user-input" id="room_id_input" type="text" placeholder="Room Id" />
         <input class="input user-input" id="category_input" type="text" placeholder="Room Category" />
         <input class="input user-input" id="price_input" type="text" placeholder="Maximum Price" />
         <input class="input user-input" id="hotel_name_input" type="text" placeholder="Hotel Name" />
+
     </form>
 
     <!--buttons with the main functionalities-->
     <form class="container">
-        <button id="show_all_button" type="button" class="btn btn-info">Show all Rooms</button>
 
         <button id="book_room_button" type="button" class="btn btn-info">Book Room</button>
             <input class="input user-input" id="begin_date_input" type="text" placeholder="Begining Date" />
             <input class="input user-input" id="end_date_input" type="text" placeholder="Ending Date" />
+        <br />
 
-        <button id="delete_button" type="button" class="btn btn-info">Delete Reservation</button>
-        @*<select id="select-types" name="types"></select>*@
+        <button id="show_all_button" type="button" class="btn btn-info">Show all Rooms</button>
+        <button id="delete_reservation_button" type="button" class="btn btn-info">Delete Reservation</button>
+        <select id="select_types" name="types"></select>
+
     </form>
 
     <div id="maindiv"></div><br />
 
-
-    @*Price: <input type="text" id="price" />
-    <br />
-    <input id="buttonGetRoomsWithPrice" type="button" value="Show Rooms up to the given price" />
-    <br/>
-    <input id="buttonGetAllRooms" type="button" value="Show All Rooms" />
-    <br/>
-    Resulting rooms: 
-    <div id="maindiv"></div><br />*@
 </body>
 
 <script>
@@ -81,13 +77,42 @@
             });
         });
         
+        // if someone clicks in the table, we want to get that info
+        $(document).on("click", "tr", function(){
+            var $roomId = $(this).find("td")[0].innerHTML;
+            //var $type = $(this).find("td")[1].innerHTML;
+            //var $severity = $(this).find("td")[2].innerHTML;
+            //var $date = $(this).find("td")[3].innerHTML;
+            //var $message = $(this).find("td")[4].innerHTML;
+
+            $("#room_id_input").val($roomId);
+            //$("#type-input").val($type);
+            //$("#severity-input").val($severity);
+            //$("#date-input").val($date);
+            //$("#message-input").val($message);
+        });
+
         // code for the book_room_button
         $("#book_room_button").on("click", function () {
 
             $.get("/Main/BookRoom", {   userName: "@user.Name",
                                         beginDate: $("#begin_date_input").val(),
-                                        endDate: $("#end_date_input").val()
+                                        endDate: $("#end_date_input").val(),
+                                        roomId: $("#room_id_input").val()
                                     }, 
+                function(data, status){
+                    $("#maindiv").html(data);
+                });
+        });
+
+        // code for delete_reservation_button
+        $("#delete_reservation_button").on("click", function () {
+
+            $.get("/Main/DeleteReservation", {   userName: "@user.Name",
+                beginDate: $("#begin_date_input").val(),
+                endDate: $("#end_date_input").val(),
+                roomId: $("#room_id_input").val()
+            }, 
                 function(data, status){
                     $("#maindiv").html(data);
                 });

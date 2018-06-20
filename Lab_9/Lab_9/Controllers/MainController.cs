@@ -18,6 +18,7 @@ using System.Web;
 using System.Web.Mvc;
 using Lab_9.Models;
 using Lab_9.DataAbstractionLayer;
+using System.Diagnostics;
 
 namespace Lab_9.Controllers
 {
@@ -34,7 +35,7 @@ namespace Lab_9.Controllers
             User user = dal.Authenticate(userName, password);
             if(user == null)
             {
-                Console.Write("User login failed!");
+                Debug.WriteLine("User login failed!");
                 return View("Error");
             }
 
@@ -68,7 +69,7 @@ namespace Lab_9.Controllers
             int price;
             if (!int.TryParse(Request.Params["price"], out price))
             {
-                Console.Write("Could not convert price to int!");
+                Debug.WriteLine("Could not convert price to int!");
                 return "";
             }
 
@@ -92,24 +93,46 @@ namespace Lab_9.Controllers
         {
             // get our params, i.e. UserName, BeginDate, EndDate
             string userName = Request.Params["userName"];
+            DAL dal = new DAL();
 
+            // parse the room id
+            int roomId;
+            if(!int.TryParse(Request.Params["roomId"], out roomId))
+            {
+                Debug.WriteLine("\t[ERROR] Failed to parse room id from parameters!");
+            }
+
+            // parse the dates
             DateTime beginDate, endDate;
 
-            if(!DateTime.TryParse(Request.Params["beginDate"], out beginDate))
+            if (!DateTime.TryParse(Request.Params["beginDate"], out beginDate))
             {
-                Console.Write("Failed to parse begin date from parameters!");
+                Debug.WriteLine("\t[ERROR] Failed to parse begin date from parameters!");
             }
 
             if (!DateTime.TryParse(Request.Params["endDate"], out endDate))
             {
-                Console.Write("Failed to parse begin date from parameters!");
+                Debug.WriteLine("\t[ERROR] Failed to parse begin date from parameters!");
             }
 
+            Debug.WriteLine("[INFO] Booking room id = {0} for client name = {1}, begin date = {2}, end date = {3}", 
+                roomId, 
+                userName, 
+                beginDate.ToString("yyyy-MM-dd"), 
+                endDate.ToString("yyyy-MM-dd"));
 
-            Console.Write("Bookin room for client {1}, begin date {2}, end date {3}", userName, beginDate, endDate);
-
-            return "";
+            // update the room with the given data
+            bool updated = dal.BookRoom(roomId, userName, beginDate, endDate);
+            if(!updated)
+            {
+                Debug.WriteLine("[ERROR] BookRoom Failed!");
+                return "";
+            }
+            
+            // update the new rooms list
+            return GetAllRooms();
         }
+
         // GET: Main
         public ActionResult Index()
         {
@@ -125,8 +148,8 @@ namespace Lab_9.Controllers
             tableData += "<td>" + room.Price + "</td>";
             tableData += "<td>" + room.HotelName + "</td>";
             tableData += "<td>" + room.GuestName + "</td>";
-            tableData += "<td>" + room.BeginDate.ToString("dd-mm-yyyy") + "</td>";
-            tableData += "<td>" + room.EndDate.ToString("dd-mm-yyyy") + "</td>";
+            tableData += "<td>" + room.BeginDate.ToString("dd-MM-yyyy") + "</td>";
+            tableData += "<td>" + room.EndDate.ToString("dd-MM-yyyy") + "</td>";
 
             return tableData;
         }

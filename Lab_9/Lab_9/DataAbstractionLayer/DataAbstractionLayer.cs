@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Diagnostics;
 
 namespace Lab_9.DataAbstractionLayer
 {
@@ -34,11 +35,11 @@ namespace Lab_9.DataAbstractionLayer
             }
             catch(MySqlException exception)
             {
-                Console.Write(exception.Message);
+                Debug.WriteLine(exception.Message);
             }
             catch (Exception)
             {
-                Console.Write("Unhandled exception caught!");
+                Debug.WriteLine("Unhandled exception caught!");
             }
 
             return user;
@@ -62,11 +63,11 @@ namespace Lab_9.DataAbstractionLayer
             }
             catch (MySql.Data.MySqlClient.MySqlException exception)
             {
-                Console.Write(exception.Message);
+                Debug.WriteLine(exception.Message);
             }
             catch(Exception)
             {
-                Console.Write("Unhandled Exception Caught!");
+                Debug.WriteLine("Unhandled Exception Caught!");
             }
             
             return roomsList;
@@ -90,14 +91,73 @@ namespace Lab_9.DataAbstractionLayer
             }
             catch (MySql.Data.MySqlClient.MySqlException exception)
             {
-                Console.Write(exception.Message);
+                Debug.WriteLine("\t[ERROR] " + exception.Message);
             }
             catch (Exception)
             {
-                Console.Write("Unhandled Exception Caught!");
+                Debug.WriteLine("\t[ERROR] Unhandled Exception Caught!");
             }
 
             return roomsList;
+        }
+
+        // returns  true if the booking was a success
+        //          false otherwise
+        public bool BookRoom(int roomId, string guestName, DateTime beginDate, DateTime endDate)
+        {
+            bool found = false;
+
+            try
+            {
+                // get the room with the given id
+                List<Room> roomsList = GetAllRooms();
+
+                foreach (Room room in roomsList)
+                {
+                    // if the guest name would not be "" or the current guest name
+                    // we should not update the room
+                    if (room.RoomId == roomId && (room.GuestName == "" || room.GuestName == guestName))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    UpdateRoomWithBookingInfo(guestName, roomId, beginDate, endDate);
+                }
+                else
+                {
+                    Debug.WriteLine("\t[ERROR] Could not match Room Id with Guest Name!");
+                }
+            }
+            catch(MySqlException mysqlException)
+            {
+                Debug.WriteLine("\t[ERROR] " + mysqlException.Message);
+            }
+
+            return found;
+        }
+
+        private void UpdateRoomWithBookingInfo(string guestName, int roomId, DateTime beginDate, DateTime endDate)
+        {
+            MySqlCommand mysqlCommand = new MySqlCommand();
+
+            mysqlCommand.Connection = InitializeConnection();
+
+            mysqlCommand.CommandText =
+                "UPDATE rooms SET " +
+                "GuestName = '" + guestName + "', " +
+                "BeginDate = '" + beginDate.ToString("yyyy-MM-dd") + "', " +
+                "EndDate = '" + endDate.ToString("yyyy-MM-dd") + "' " +
+                "WHERE RoomId = " + roomId.ToString();
+            Debug.WriteLine(mysqlCommand.CommandText);
+
+            int affectedRows = mysqlCommand.ExecuteNonQuery();
+            Debug.WriteLine("[Info] Update Query affected {0} rows", affectedRows);
+
+            mysqlCommand.Connection.Close();
         }
 
         private List<Room> ParseReaderResults(MySqlDataReader mysqlDataReader)
