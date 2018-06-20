@@ -44,6 +44,29 @@ namespace Lab_9.Controllers
             return View("FilterRooms");
         }
 
+        public string GetRoomCategories()
+        {
+            DAL dal = new DAL();
+            List<Room> roomsList = dal.GetAllRooms();
+
+            string htmlFilter = "<select id='select_types' name='types'><option value=''>Filter by room category:</option>";
+
+            HashSet<string> roomCategories = new HashSet<string>();
+
+            foreach (Room room in roomsList)
+            {
+                roomCategories.Add(room.Category);
+            }
+
+            foreach(string category in roomCategories)
+            {
+                htmlFilter += "<option value='" + category + "'>" + category + "</option>";
+
+            }
+
+            return htmlFilter;
+        }
+
         public string GetAllRooms()
         {
             DAL dataAbstractionLayer = new DAL();
@@ -100,6 +123,7 @@ namespace Lab_9.Controllers
             if(!int.TryParse(Request.Params["roomId"], out roomId))
             {
                 Debug.WriteLine("\t[ERROR] Failed to parse room id from parameters!");
+                return "";
             }
 
             // parse the dates
@@ -108,11 +132,13 @@ namespace Lab_9.Controllers
             if (!DateTime.TryParse(Request.Params["beginDate"], out beginDate))
             {
                 Debug.WriteLine("\t[ERROR] Failed to parse begin date from parameters!");
+                return "";
             }
 
             if (!DateTime.TryParse(Request.Params["endDate"], out endDate))
             {
                 Debug.WriteLine("\t[ERROR] Failed to parse begin date from parameters!");
+                return "";
             }
 
             Debug.WriteLine("[INFO] Booking room id = {0} for client name = {1}, begin date = {2}, end date = {3}", 

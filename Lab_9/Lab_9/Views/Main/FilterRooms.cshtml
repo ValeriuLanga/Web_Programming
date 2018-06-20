@@ -39,6 +39,8 @@
 <body>
     
     <!--form which contains inputs for the filtering of the rooms-->
+    <h2>Filtering Criteria</h2>
+    <br />
     <form class="container">
 
         <input class="input user-input" id="room_id_input" type="text" placeholder="Room Id" />
@@ -49,7 +51,7 @@
     </form>
 
     <!--buttons with the main functionalities-->
-    <form class="container">
+    <form class="container" method="post">
 
         <button id="book_room_button" type="button" class="btn btn-info">Book Room</button>
             <input class="input user-input" id="begin_date_input" type="text" placeholder="Begining Date" />
@@ -69,7 +71,13 @@
 <script>
     $(document).ready(function () {
 
-        // what happens when we click show all
+        // fill the filter box with the types of rooms available
+        $.get("/Main/GetRoomCategories",
+            function (result) {
+                $("#select_types").html(result);
+        });
+
+        // add some calls behind the button
         $("#show_all_button").on("click", function () {
             $.get("/Main/GetAllRooms",
                 function(data,status) {
