@@ -1,9 +1,12 @@
 ﻿/*
  Write a web application for room booking in a hotel chain. The application should save
-room information in the database. The clients should have the posibility of browsing the
-rooms by category, type, price, hotel etc. (use AJAX for this), booking one or more rooms
-for a specific period of time, but also they should have the posibility of cancelling their
-reservation. Rooms browsing should be paged - rooms are displayed on pages with maximum
+room information in the database. The clients should have the posibility of 
+
+- browsing the rooms by category, type, price, hotel etc. (use AJAX for this), 
+- booking one or more rooms for a specific period of time, but also they should have the 
+- posibility of cancelling their reservation. 
+
+Rooms browsing should be paged - rooms are displayed on pages with maximum
 4 rooms on a page (you should be able to go to the previous and the next page).
 
 */
@@ -35,7 +38,9 @@ namespace Lab_9.Controllers
                 return View("Error");
             }
 
-            return View("FIlterRooms");
+            // set up the ViewData with our user, so he can book rooms
+            ViewData["user"] = user;
+            return View("FilterRooms");
         }
 
         public string GetAllRooms()
@@ -83,6 +88,28 @@ namespace Lab_9.Controllers
             return result; 
         }
 
+        public string BookRoom()
+        {
+            // get our params, i.e. UserName, BeginDate, EndDate
+            string userName = Request.Params["userName"];
+
+            DateTime beginDate, endDate;
+
+            if(!DateTime.TryParse(Request.Params["beginDate"], out beginDate))
+            {
+                Console.Write("Failed to parse begin date from parameters!");
+            }
+
+            if (!DateTime.TryParse(Request.Params["endDate"], out endDate))
+            {
+                Console.Write("Failed to parse begin date from parameters!");
+            }
+
+
+            Console.Write("Bookin room for client {1}, begin date {2}, end date {3}", userName, beginDate, endDate);
+
+            return "";
+        }
         // GET: Main
         public ActionResult Index()
         {
@@ -98,8 +125,8 @@ namespace Lab_9.Controllers
             tableData += "<td>" + room.Price + "</td>";
             tableData += "<td>" + room.HotelName + "</td>";
             tableData += "<td>" + room.GuestName + "</td>";
-            tableData += "<td>" + room.BeginDate + "</td>";
-            tableData += "<td>" + room.EndDate + "</td>";
+            tableData += "<td>" + room.BeginDate.ToString("dd-mm-yyyy") + "</td>";
+            tableData += "<td>" + room.EndDate.ToString("dd-mm-yyyy") + "</td>";
 
             return tableData;
         }

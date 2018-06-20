@@ -1,49 +1,106 @@
-﻿@{
+﻿
+@using Lab_9.Models;
+
+@{
     Layout = null;
 }
 
-<!DOCTYPE html>
+@*<!DOCTYPE html>
 
-<html>
+<html>*@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>ShowRooms</title>
     <script src="~/Scripts/jquery-1.10.2.js"></script>
-    <script>
-                    $(document).ready(function(){
-                        $("#buttonGetAllRooms").click(function() {
-                            $.get("/Main/GetAllRooms",
-                                function(data,status) {
-                                    $("#maindiv").html(data);
-                            });
-                        });
-                    });
-    </script>
 
-    <meta name="viewport" content="width=device-width" />
-    <title>FilterRooms</title>
-    <script src="~/Scripts/jquery-1.10.2.js"></script>
-    <script>
-                    $(document).ready(function(){
-                        $("#buttonGetRoomsWithPrice").click(function() {
-                            $.get("/Main/GetRoomsWithGivenPrice", { price: $("#price").val() },
-                                function(data,status) {
-                                    $("#maindiv").html(data);
-                            });
-                        });
-                    });
-    </script>
+    <!-- add some paginations stuff-->
+    <style>
+        #pagination a 
+        {
+            color: black;
+            padding: 8px 16px;
+        }
+
+        #pagination a.active
+        {
+            color: aquamarine;
+        }
+
+
+    </style>
 </head>
 
+
+@{
+    //Get the name of our user, so we can use it to book rooms
+    User user = (User)ViewData["user"];
+}
+
 <body>
-    Price: <input type="text" id="price" />
+    
+    <!--form which contains inputs for the filtering of the rooms-->
+    <form class="container">
+        <input class="input user-input" id="category_input" type="text" placeholder="Room Category" />
+        <input class="input user-input" id="price_input" type="text" placeholder="Maximum Price" />
+        <input class="input user-input" id="hotel_name_input" type="text" placeholder="Hotel Name" />
+    </form>
+
+    <!--buttons with the main functionalities-->
+    <form class="container">
+        <button id="show_all_button" type="button" class="btn btn-info">Show all Rooms</button>
+
+        <button id="book_room_button" type="button" class="btn btn-info">Book Room</button>
+            <input class="input user-input" id="begin_date_input" type="text" placeholder="Begining Date" />
+            <input class="input user-input" id="end_date_input" type="text" placeholder="Ending Date" />
+
+        <button id="delete_button" type="button" class="btn btn-info">Delete Reservation</button>
+        @*<select id="select-types" name="types"></select>*@
+    </form>
+
+    <div id="maindiv"></div><br />
+
+
+    @*Price: <input type="text" id="price" />
     <br />
     <input id="buttonGetRoomsWithPrice" type="button" value="Show Rooms up to the given price" />
     <br/>
     <input id="buttonGetAllRooms" type="button" value="Show All Rooms" />
     <br/>
     Resulting rooms: 
-    <div id="maindiv"></div><br />
-
+    <div id="maindiv"></div><br />*@
 </body>
-</html>
+
+<script>
+    $(document).ready(function () {
+
+        // what happens when we click show all
+        $("#show_all_button").on("click", function () {
+            $.get("/Main/GetAllRooms",
+                function(data,status) {
+                    $("#maindiv").html(data);
+            });
+        });
+        
+        // code for the book_room_button
+        $("#book_room_button").on("click", function () {
+
+            $.get("/Main/BookRoom", {   userName: "@user.Name",
+                                        beginDate: $("#begin_date_input").val(),
+                                        endDate: $("#end_date_input").val()
+                                    }, 
+                function(data, status){
+                    $("#maindiv").html(data);
+                });
+        });
+
+        $("#buttonGetRoomsWithPrice").click(function() {
+            $.get("/Main/GetRoomsWithGivenPrice", { price: $("#price").val() },
+                function(data,status) {
+                    $("#maindiv").html(data);
+            });
+        });
+
+    });
+</script>
+
+@*</html>*@
