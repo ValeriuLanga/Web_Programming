@@ -85,19 +85,11 @@
             });
         });
         
-        // if someone clicks in the table, we want to get that info
+        // if someone clicks in the table, we want to get the roomId
+        // so we can further use it 
         $(document).on("click", "tr", function(){
             var $roomId = $(this).find("td")[0].innerHTML;
-            //var $type = $(this).find("td")[1].innerHTML;
-            //var $severity = $(this).find("td")[2].innerHTML;
-            //var $date = $(this).find("td")[3].innerHTML;
-            //var $message = $(this).find("td")[4].innerHTML;
-
             $("#room_id_input").val($roomId);
-            //$("#type-input").val($type);
-            //$("#severity-input").val($severity);
-            //$("#date-input").val($date);
-            //$("#message-input").val($message);
         });
 
         // code for the book_room_button
@@ -116,13 +108,22 @@
         // code for delete_reservation_button
         $("#delete_reservation_button").on("click", function () {
 
-            $.get("/Main/DeleteReservation", {   userName: "@user.Name",
-                beginDate: $("#begin_date_input").val(),
-                endDate: $("#end_date_input").val(),
-                roomId: $("#room_id_input").val()
+            $.get("/Main/DeleteReservation", {
+                    userName: "@user.Name",
+                    roomId: $("#room_id_input").val()
             }, 
-                function(data, status){
-                    $("#maindiv").html(data);
+                function(result){
+                    if(result == "true")
+                    {
+                        $.get("/Main/GetAllRooms",
+                        function (data, status) {
+                            $("#maindiv").html(data);
+                        });
+                    }
+                    else
+                    {
+                        alert("Could not cancel room booking!");
+                    }
                 });
         });
 

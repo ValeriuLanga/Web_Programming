@@ -140,6 +140,63 @@ namespace Lab_9.DataAbstractionLayer
             return found;
         }
 
+        public bool DeleteReservation(string guestName, int roomId)
+        {
+            bool found = false;
+
+            try
+            {
+                // get the room with the given id
+                List<Room> roomsList = GetAllRooms();
+
+                foreach (Room room in roomsList)
+                {
+                    // if the guest name would not be "" or the current guest name
+                    // we should not update the room
+                    if (room.RoomId == roomId && room.GuestName == guestName)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    UpdateRoomWithDeletedReservation(roomId);
+                }
+                else
+                {
+                    Debug.WriteLine("\t[ERROR] Could not match Room Id with Guest Name!");
+                }
+            }
+            catch (MySqlException mysqlException)
+            {
+                Debug.WriteLine("\t[ERROR] " + mysqlException.Message);
+            }
+
+            return found;
+        }
+
+        private void UpdateRoomWithDeletedReservation(int roomId)
+        {
+            MySqlCommand mysqlCommand = new MySqlCommand();
+
+            mysqlCommand.Connection = InitializeConnection();
+
+            mysqlCommand.CommandText =
+                "UPDATE rooms SET " +
+                "GuestName = '', " +
+                "BeginDate = '0000-00-00', " +
+                "EndDate = '0000-00-00'  " +
+                "WHERE RoomId = " + roomId.ToString();
+            Debug.WriteLine("[INFO] " + mysqlCommand.CommandText);
+
+            int affectedRows = mysqlCommand.ExecuteNonQuery();
+            Debug.WriteLine("[INFO] Update Query affected {0} rows", affectedRows);
+
+            mysqlCommand.Connection.Close();
+        }
+
         private void UpdateRoomWithBookingInfo(string guestName, int roomId, DateTime beginDate, DateTime endDate)
         {
             MySqlCommand mysqlCommand = new MySqlCommand();

@@ -186,6 +186,24 @@ namespace Lab_9.Controllers
             return GetAllRooms();
         }
 
+        public string DeleteReservation()
+        {
+            // get our params, i.e. UserName, BeginDate, EndDate
+            string guestName = Request.Params["userName"];
+            DAL dal = new DAL();
+
+            // parse the room id
+            int roomId;
+            if (!int.TryParse(Request.Params["roomId"], out roomId))
+            {
+                Debug.WriteLine("\t[ERROR] Failed to parse room id from parameters!");
+                return "false";
+            }
+
+            // return some ugly looking string boolean
+            return (dal.DeleteReservation(guestName, roomId)) ? "true" : "false" ;
+        }
+
         // GET: Main
         public ActionResult Index()
         {
