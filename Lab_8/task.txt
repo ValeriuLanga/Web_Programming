@@ -1,0 +1,9 @@
+Solve the following problem using the JSP/Servlet technology. State information (between web requests)
+is always stored in a database; you may store some state information in cookies/session objects.
+Write a web application for maintaining a collection of URLs for a list of users.
+Each user can
+
+- add or delete URLs from his/her collection
+- must authenticate prior to using the application.
+- A guest user (i.e. not authenticated) can still see a list with the top 10 most popular URLs, but
+- an authenticated user can see a list with the top N most popular URLs, where N is configurable by the user.
